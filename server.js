@@ -18,7 +18,7 @@ const peerServer = ExpressPeerServer(server, {
 
 // Middleware
 app.use('/peerjs', peerServer);
-app.use(express.static('public'));
+app.use(express.static('public')); // Ensure 'public' contains your HTML file
 
 // Redirect to a new room
 app.get('/', (req, res) => {
