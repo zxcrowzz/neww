@@ -1,14 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Chat</title>
     <style>
         #video-grid {
             display: flex;
             flex-wrap: wrap;
+            justify-content: center;
         }
         video {
             margin: 10px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            max-width: 200px;
         }
     </style>
 </head>
@@ -29,27 +35,30 @@
         myVideo.muted = true;
         const peers = {};
 
-        navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: true
-        }).then(stream => {
-            addVideoStream(myVideo, stream);
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+            .then(stream => {
+                addVideoStream(myVideo, stream);
 
-            myPeer.on('call', call => {
-                call.answer(stream);
-                const video = document.createElement('video');
-                call.on('stream', userVideoStream => {
-                    addVideoStream(video, userVideoStream);
+                myPeer.on('call', call => {
+                    call.answer(stream);
+                    const video = document.createElement('video');
+                    call.on('stream', userVideoStream => {
+                        addVideoStream(video, userVideoStream);
+                    });
                 });
-            });
 
-            socket.on('user-connected', userId => {
-                connectToNewUser(userId, stream);
+                socket.on('user-connected', userId => {
+                    connectToNewUser(userId, stream);
+                });
+            })
+            .catch(error => {
+                console.error('Error accessing media devices.', error);
             });
-        });
 
         socket.on('user-disconnected', userId => {
-            if (peers[userId]) peers[userId].close();
+            if (peers[userId]) {
+                peers[userId].close();
+            }
         });
 
         myPeer.on('open', id => {
