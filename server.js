@@ -6,7 +6,10 @@ const { v4: uuidV4 } = require("uuid");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    transports: ['websocket'],
+    upgrade: false
+});
 
 const peerServer = ExpressPeerServer(server, {
     path: '/peerjs'
